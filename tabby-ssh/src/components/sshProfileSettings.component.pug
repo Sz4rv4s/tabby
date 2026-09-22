@@ -246,6 +246,16 @@ ul.nav-tabs(ngbNav, #nav='ngbNav')
 
             .form-line
                 .header
+                    .title(translate) Character encoding
+                    .description(translate) Encoding used for terminal input and output (e.g. UTF-8, ANSI_X3.4-1968, ISO-8859-1)
+                input.form-control(
+                    type='text',
+                    placeholder='UTF-8',
+                    [(ngModel)]='profile.options.encoding',
+                )
+
+            .form-line
+                .header
                     .title(translate) Keep Alive Interval (Milliseconds)
                 input.form-control(
                     type='number',

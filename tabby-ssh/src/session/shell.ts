@@ -7,6 +7,8 @@ import { SSHSession } from './ssh'
 import { openShellChannelForProfile } from './shellChannel'
 import { SSHProfile } from '../api'
 import * as russh from 'russh'
+import { DEFAULT_SSH_ENCODING, resolveSSHEncoding } from './encodingCodec'
+import { SSHEncodingMiddleware } from './encoding'
 
 
 export class SSHShellSession extends BaseSession {
@@ -22,6 +24,12 @@ export class SSHShellSession extends BaseSession {
     ) {
         super(injector.get(LogService).create(`ssh-shell-${profile.options.host}-${profile.options.port}`))
         this.ssh = ssh
+        const encoding = resolveSSHEncoding(profile.options.encoding)
+        if (encoding.toLowerCase() !== DEFAULT_SSH_ENCODING && encoding.toLowerCase() !== 'utf8') {
+            // OSC metadata is processed before conversion; login scripts and terminal
+            // rendering receive UTF-8, while their replies are encoded for the host.
+            this.middleware.push(new SSHEncodingMiddleware(encoding))
+        }
         this.setLoginScriptsOptions(this.profile.options)
         this.ssh.serviceMessage$.subscribe(m => this.serviceMessage.next(m))
         this.middleware.push(new UTF8SplitterMiddleware())
@@ -115,7 +123,7 @@ export class SSHShellSession extends BaseSession {
 
     private changeInitialDirectory (dir: string): void {
         // The leading space keeps the command out of shell history on shells with HISTCONTROL=ignorespace
-        this.write(Buffer.from(` cd -- '${dir.replace(/'/g, `'\\''`)}'\n`))
+        this.feedFromTerminal(Buffer.from(` cd -- '${dir.replace(/'/g, `'\\''`)}'\n`))
     }
 
     supportsWorkingDirectory (): boolean {
