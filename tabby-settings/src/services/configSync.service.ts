@@ -159,10 +159,11 @@ export class ConfigSyncService {
     }
 
     private async request (method: 'GET'|'POST'|'PATCH'|'DELETE', url: string, { data }: { data?: any } = {}) {
-        if (this.config.store.configSync.host.endsWith('/')) {
-            this.config.store.configSync.host = this.config.store.configSync.host.slice(0, -1)
+        const configuredHost = this.config.store.configSync.host
+        if (!configuredHost) {
+            throw new Error('Config sync host is not configured')
         }
-        const host: string = this.config.store.configSync.host
+        const host = configuredHost.replace(/\/$/, '')
         // Refuse to sync configuration over a plaintext channel. The remote
         // payload is parsed as YAML and merged into the local config (including
         // profiles whose `command`/`env` are later executed by the terminal),
