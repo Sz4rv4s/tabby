@@ -247,12 +247,10 @@ ul.nav-tabs(ngbNav, #nav='ngbNav')
             .form-line
                 .header
                     .title(translate) Character encoding
-                    .description(translate) Encoding used for terminal input and output (e.g. UTF-8, ANSI_X3.4-1968, ISO-8859-1)
-                input.form-control(
-                    type='text',
-                    placeholder='UTF-8',
-                    [(ngModel)]='profile.options.encoding',
-                )
+                    .description(translate) Encoding used for terminal input and output
+                select.form-control([(ngModel)]='profile.options.encoding')
+                    option([ngValue]='encoding.value', *ngFor='let encoding of encodingOptions') {{encoding.label}}
+                    option([ngValue]='profile.options.encoding', *ngIf='isCustomEncoding()') {{profile.options.encoding}} (custom)
 
             .form-line
                 .header

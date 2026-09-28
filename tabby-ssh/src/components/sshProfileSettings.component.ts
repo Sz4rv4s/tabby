@@ -22,6 +22,24 @@ export class SSHProfileSettingsComponent implements ProfileSettingsComponent<SSH
     connectionMode: 'direct'|'proxyCommand'|'jumpHost'|'socksProxy'|'httpProxy' = 'direct'
 
     supportedAlgorithms = supportedAlgorithms
+    encodingOptions = [
+        { value: 'utf-8', label: 'UTF-8' },
+        { value: 'ANSI_X3.4-1968', label: 'US-ASCII (ANSI_X3.4-1968)' },
+        { value: 'ISO-8859-1', label: 'ISO-8859-1 (Western European)' },
+        { value: 'ISO-8859-2', label: 'ISO-8859-2 (Central European)' },
+        { value: 'Windows-1250', label: 'Windows-1250 (Central European)' },
+        { value: 'Windows-1251', label: 'Windows-1251 (Cyrillic)' },
+        { value: 'Windows-1252', label: 'Windows-1252 (Western European)' },
+        { value: 'CP437', label: 'CP437 (DOS US)' },
+        { value: 'CP850', label: 'CP850 (DOS Western European)' },
+        { value: 'KOI8-R', label: 'KOI8-R (Cyrillic)' },
+        { value: 'Shift_JIS', label: 'Shift_JIS (Japanese)' },
+        { value: 'EUC-JP', label: 'EUC-JP (Japanese)' },
+        { value: 'GB18030', label: 'GB18030 (Chinese)' },
+        { value: 'Big5', label: 'Big5 (Chinese)' },
+        { value: 'EUC-KR', label: 'EUC-KR (Korean)' },
+    ]
+
     algorithms: Record<string, Record<string, boolean>> = {}
     jumpHosts: PartialProfile<SSHProfile>[]
     @ViewChild('loginScriptsSettings') loginScriptsSettings: LoginScriptsSettingsComponent|null
@@ -66,6 +84,10 @@ export class SSHProfileSettingsComponent implements ProfileSettingsComponent<SSH
 
     getJumpHostLabel (p: PartialProfile<SSHProfile>) {
         return p.group ? `${this.profilesService.resolveProfileGroupName(p.group)} / ${p.name}` : p.name
+    }
+
+    isCustomEncoding (): boolean {
+        return !!this.profile.options.encoding && !this.encodingOptions.some(x => x.value === this.profile.options.encoding)
     }
 
     async setPassword () {
